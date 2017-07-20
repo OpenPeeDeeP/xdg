@@ -8,8 +8,39 @@ package xdg
 import (
 	"os"
 	"path/filepath"
+	"runtime"
 	"strings"
 )
+
+var defaulter xdgDefaulter = new(osDefaulter)
+var seperator string
+
+func init() {
+	if runtime.GOOS == "windows" {
+		setSeperator(";")
+	} else {
+		setSeperator(":")
+	}
+}
+
+type xdgDefaulter interface {
+	defaultDataHome() string
+	defaultDataDirs() []string
+	defaultConfigHome() string
+	defaultConfigDirs() []string
+	defaultCacheHome() string
+}
+
+type osDefaulter struct {
+}
+
+func setDefaulter(def xdgDefaulter) {
+	defaulter = def
+}
+
+func setSeperator(sep string) {
+	seperator = sep
+}
 
 // XDG is information about the currently running application
 type XDG struct {
@@ -62,7 +93,7 @@ func (x *XDG) CacheHome() string {
 func DataHome() string {
 	dataHome := os.Getenv("XDG_DATA_HOME")
 	if dataHome == "" {
-		dataHome = defaultDataHome()
+		dataHome = defaulter.defaultDataHome()
 	}
 	return dataHome
 }
@@ -72,10 +103,10 @@ func DataDirs() []string {
 	var dataDirs []string
 	dataDirsStr := os.Getenv("XDG_DATA_DIRS")
 	if dataDirsStr != "" {
-		dataDirs = strings.Split(dataDirsStr, ":")
+		dataDirs = strings.Split(dataDirsStr, seperator)
 	}
 	if len(dataDirs) == 0 {
-		dataDirs = defaultDataDirs()
+		dataDirs = defaulter.defaultDataDirs()
 	}
 	return dataDirs
 }
@@ -84,7 +115,7 @@ func DataDirs() []string {
 func ConfigHome() string {
 	configHome := os.Getenv("XDG_CONFIG_HOME")
 	if configHome == "" {
-		configHome = defaultConfigHome()
+		configHome = defaulter.defaultConfigHome()
 	}
 	return configHome
 }
@@ -94,10 +125,10 @@ func ConfigDirs() []string {
 	var configDirs []string
 	configDirsStr := os.Getenv("XDG_CONFIG_DIRS")
 	if configDirsStr != "" {
-		configDirs = strings.Split(configDirsStr, ":")
+		configDirs = strings.Split(configDirsStr, seperator)
 	}
 	if len(configDirs) == 0 {
-		configDirs = defaultConfigDirs()
+		configDirs = defaulter.defaultConfigDirs()
 	}
 	return configDirs
 }
@@ -106,7 +137,7 @@ func ConfigDirs() []string {
 func CacheHome() string {
 	cacheHome := os.Getenv("XDG_CACHE_HOME")
 	if cacheHome == "" {
-		cacheHome = defaultCacheHome()
+		cacheHome = defaulter.defaultCacheHome()
 	}
 	return cacheHome
 }

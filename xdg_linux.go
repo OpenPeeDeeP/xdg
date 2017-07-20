@@ -9,22 +9,22 @@ import (
 	"path/filepath"
 )
 
-func defaultDataHome() string {
+func (o *osDefaulter) defaultDataHome() string {
 	return filepath.Join(os.Getenv("HOME"), ".local", "share")
 }
 
-func defaultDataDirs() []string {
+func (o *osDefaulter) defaultDataDirs() []string {
 	return []string{"/usr/local/share/", "/usr/share/"}
 }
 
-func defaultConfigHome() string {
+func (o *osDefaulter) defaultConfigHome() string {
 	return filepath.Join(os.Getenv("HOME"), ".config")
 }
 
-func defaultConfigDirs() []string {
+func (o *osDefaulter) defaultConfigDirs() []string {
 	return []string{"/etc/xdg"}
 }
 
-func defaultCacheHome() string {
+func (o *osDefaulter) defaultCacheHome() string {
 	return filepath.Join(os.Getenv("HOME"), ".cache")
 }
