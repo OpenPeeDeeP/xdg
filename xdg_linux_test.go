@@ -14,6 +14,7 @@ import (
 )
 
 func TestDefaultDataHome(t *testing.T) {
+	setDefaulter(new(osDefaulter))
 	assert := assert.New(t)
 	homeDir := "/some/path"
 	expected := homeDir + "/.local/share"
@@ -24,6 +25,7 @@ func TestDefaultDataHome(t *testing.T) {
 }
 
 func TestDefaultDataDirs(t *testing.T) {
+	setDefaulter(new(osDefaulter))
 	assert := assert.New(t)
 	expected := []string{"/usr/local/share/", "/usr/share/"}
 
@@ -32,6 +34,7 @@ func TestDefaultDataDirs(t *testing.T) {
 }
 
 func TestDefaultConfigHome(t *testing.T) {
+	setDefaulter(new(osDefaulter))
 	assert := assert.New(t)
 	homeDir := "/some/path"
 	expected := homeDir + "/.config"
@@ -42,6 +45,7 @@ func TestDefaultConfigHome(t *testing.T) {
 }
 
 func TestDefaultConfigDirs(t *testing.T) {
+	setDefaulter(new(osDefaulter))
 	assert := assert.New(t)
 	expected := []string{"/etc/xdg"}
 
@@ -50,6 +54,7 @@ func TestDefaultConfigDirs(t *testing.T) {
 }
 
 func TestDefaultCacheHome(t *testing.T) {
+	setDefaulter(new(osDefaulter))
 	assert := assert.New(t)
 	homeDir := "/some/path"
 	expected := homeDir + "/.cache"

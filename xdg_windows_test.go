@@ -14,6 +14,7 @@ import (
 )
 
 func TestDefaultDataHome(t *testing.T) {
+	setDefaulter(new(osDefaulter))
 	assert := assert.New(t)
 	appData := "/some/path"
 	expected := appData
@@ -24,6 +25,7 @@ func TestDefaultDataHome(t *testing.T) {
 }
 
 func TestDefaultDataDirs(t *testing.T) {
+	setDefaulter(new(osDefaulter))
 	assert := assert.New(t)
 	programData := "/some/path"
 	expected := []string{programData}
@@ -34,6 +36,7 @@ func TestDefaultDataDirs(t *testing.T) {
 }
 
 func TestDefaultConfigHome(t *testing.T) {
+	setDefaulter(new(osDefaulter))
 	assert := assert.New(t)
 	appData := "/some/path"
 	expected := appData
@@ -44,6 +47,7 @@ func TestDefaultConfigHome(t *testing.T) {
 }
 
 func TestDefaultConfigDirs(t *testing.T) {
+	setDefaulter(new(osDefaulter))
 	assert := assert.New(t)
 	programData := "/some/path"
 	expected := []string{programData}
@@ -54,6 +58,7 @@ func TestDefaultConfigDirs(t *testing.T) {
 }
 
 func TestDefaultCacheHome(t *testing.T) {
+	setDefaulter(new(osDefaulter))
 	assert := assert.New(t)
 	appData := "/some/path"
 	expected := appData
