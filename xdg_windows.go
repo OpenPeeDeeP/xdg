@@ -6,6 +6,10 @@ package xdg
 
 import "os"
 
+func init() {
+	setSeparator(";")
+}
+
 func (o *osDefaulter) defaultDataHome() string {
 	return os.Getenv("APPDATA")
 }

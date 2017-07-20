@@ -9,6 +9,10 @@ import (
 	"path/filepath"
 )
 
+func init() {
+	setSeparator(":")
+}
+
 func (o *osDefaulter) defaultDataHome() string {
 	return filepath.Join(os.Getenv("HOME"), ".local", "share")
 }

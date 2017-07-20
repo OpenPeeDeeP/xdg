@@ -8,20 +8,11 @@ package xdg
 import (
 	"os"
 	"path/filepath"
-	"runtime"
 	"strings"
 )
 
 var defaulter xdgDefaulter = new(osDefaulter)
-var separator string
-
-func init() {
-	if runtime.GOOS == "windows" {
-		setSeparator(";")
-	} else {
-		setSeparator(":")
-	}
-}
+var separator = ":" // This is just the default
 
 type xdgDefaulter interface {
 	defaultDataHome() string

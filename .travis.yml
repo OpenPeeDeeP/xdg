@@ -1,0 +1,6 @@
+language: go
+go:
+- stable
+os:
+- linux
+- osx
