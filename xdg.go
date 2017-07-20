@@ -13,13 +13,13 @@ import (
 )
 
 var defaulter xdgDefaulter = new(osDefaulter)
-var seperator string
+var separator string
 
 func init() {
 	if runtime.GOOS == "windows" {
-		setSeperator(";")
+		setSeparator(";")
 	} else {
-		setSeperator(":")
+		setSeparator(":")
 	}
 }
 
@@ -38,8 +38,8 @@ func setDefaulter(def xdgDefaulter) {
 	defaulter = def
 }
 
-func setSeperator(sep string) {
-	seperator = sep
+func setSeparator(sep string) {
+	separator = sep
 }
 
 // XDG is information about the currently running application
@@ -103,7 +103,7 @@ func DataDirs() []string {
 	var dataDirs []string
 	dataDirsStr := os.Getenv("XDG_DATA_DIRS")
 	if dataDirsStr != "" {
-		dataDirs = strings.Split(dataDirsStr, seperator)
+		dataDirs = strings.Split(dataDirsStr, separator)
 	}
 	if len(dataDirs) == 0 {
 		dataDirs = defaulter.defaultDataDirs()
@@ -125,7 +125,7 @@ func ConfigDirs() []string {
 	var configDirs []string
 	configDirsStr := os.Getenv("XDG_CONFIG_DIRS")
 	if configDirsStr != "" {
-		configDirs = strings.Split(configDirsStr, seperator)
+		configDirs = strings.Split(configDirsStr, separator)
 	}
 	if len(configDirs) == 0 {
 		configDirs = defaulter.defaultConfigDirs()
