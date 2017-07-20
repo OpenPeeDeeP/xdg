@@ -1,0 +1,14 @@
+version: 0.0.1_{build}
+platform: x64
+clone_folder: c:\gopath\src\github.com\OpenPeeDeeP\xdg
+environment:
+  GOPATH: c:\gopath
+install:
+- echo %PATH%
+- echo %GOPATH%
+- set PATH=%GOPATH%\bin;c:\go\bin;%PATH%
+- go version
+- go env
+build_script:
+- go test -i ./...
+- go test -v ./...
