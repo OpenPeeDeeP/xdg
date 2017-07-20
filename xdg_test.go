@@ -41,7 +41,7 @@ func TestDataHome_WithoutXDG(t *testing.T) {
 	mockDef := new(mockDefaulter)
 	mockDef.On("defaultDataHome").Return(expected)
 	setDefaulter(mockDef)
-	os.Setenv("XDG_DATA_HOME", "")
+	os.Setenv("XDG_DATA_HOME", "") // nolint: errcheck
 
 	actual := DataHome()
 	mockDef.AssertExpectations(t)
@@ -54,7 +54,7 @@ func TestDataHome_WithXDG(t *testing.T) {
 	mockDef := new(mockDefaulter)
 	mockDef.On("defaultDataHome").Return("/wrong/path")
 	setDefaulter(mockDef)
-	os.Setenv("XDG_DATA_HOME", expected)
+	os.Setenv("XDG_DATA_HOME", expected) // nolint: errcheck
 
 	actual := DataHome()
 	mockDef.AssertNotCalled(t, "defaultDataHome")
@@ -71,7 +71,7 @@ func TestDataHome_Application(t *testing.T) {
 	appXDG := New(vendor, app)
 	mockDef.On("defaultDataHome").Return(root)
 	setDefaulter(mockDef)
-	os.Setenv("XDG_DATA_HOME", "")
+	os.Setenv("XDG_DATA_HOME", "") // nolint: errcheck
 
 	actual := appXDG.DataHome()
 	mockDef.AssertExpectations(t)
@@ -84,7 +84,7 @@ func TestDataDirs_WithoutXDG(t *testing.T) {
 	mockDef := new(mockDefaulter)
 	mockDef.On("defaultDataDirs").Return(expected)
 	setDefaulter(mockDef)
-	os.Setenv("XDG_DATA_DIRS", "")
+	os.Setenv("XDG_DATA_DIRS", "") // nolint: errcheck
 
 	actual := DataDirs()
 	mockDef.AssertExpectations(t)
@@ -97,7 +97,7 @@ func TestDataDirs_WithXDG(t *testing.T) {
 	mockDef := new(mockDefaulter)
 	mockDef.On("defaultDataDirs").Return([]string{"/wrong/path"})
 	setDefaulter(mockDef)
-	os.Setenv("XDG_DATA_DIRS", strings.Join(expected, separator))
+	os.Setenv("XDG_DATA_DIRS", strings.Join(expected, separator)) // nolint: errcheck
 
 	actual := DataDirs()
 	mockDef.AssertNotCalled(t, "defaultDataDirs")
@@ -117,7 +117,7 @@ func TestDataDirs_Application(t *testing.T) {
 	appXDG := New(vendor, app)
 	mockDef.On("defaultDataDirs").Return(root)
 	setDefaulter(mockDef)
-	os.Setenv("XDG_DATA_DIRS", "")
+	os.Setenv("XDG_DATA_DIRS", "") // nolint: errcheck
 
 	actual := appXDG.DataDirs()
 	mockDef.AssertExpectations(t)
@@ -130,7 +130,7 @@ func TestConfigHome_WithoutXDG(t *testing.T) {
 	mockDef := new(mockDefaulter)
 	mockDef.On("defaultConfigHome").Return(expected)
 	setDefaulter(mockDef)
-	os.Setenv("XDG_CONFIG_HOME", "")
+	os.Setenv("XDG_CONFIG_HOME", "") // nolint: errcheck
 
 	actual := ConfigHome()
 	mockDef.AssertExpectations(t)
@@ -143,7 +143,7 @@ func TestConfigHome_WithXDG(t *testing.T) {
 	mockDef := new(mockDefaulter)
 	mockDef.On("defaultConfigHome").Return("/wrong/path")
 	setDefaulter(mockDef)
-	os.Setenv("XDG_CONFIG_HOME", expected)
+	os.Setenv("XDG_CONFIG_HOME", expected) // nolint: errcheck
 
 	actual := ConfigHome()
 	mockDef.AssertNotCalled(t, "defaultConfigHome")
@@ -160,7 +160,7 @@ func TestConfigHome_Application(t *testing.T) {
 	appXDG := New(vendor, app)
 	mockDef.On("defaultConfigHome").Return(root)
 	setDefaulter(mockDef)
-	os.Setenv("XDG_CONFIG_HOME", "")
+	os.Setenv("XDG_CONFIG_HOME", "") // nolint: errcheck
 
 	actual := appXDG.ConfigHome()
 	mockDef.AssertExpectations(t)
@@ -173,7 +173,7 @@ func TestConfigDirs_WithoutXDG(t *testing.T) {
 	mockDef := new(mockDefaulter)
 	mockDef.On("defaultConfigDirs").Return(expected)
 	setDefaulter(mockDef)
-	os.Setenv("XDG_CONFIG_DIRS", "")
+	os.Setenv("XDG_CONFIG_DIRS", "") // nolint: errcheck
 
 	actual := ConfigDirs()
 	mockDef.AssertExpectations(t)
@@ -186,7 +186,7 @@ func TestConfigDirs_WithXDG(t *testing.T) {
 	mockDef := new(mockDefaulter)
 	mockDef.On("defaultConfigDirs").Return([]string{"/wrong/path"})
 	setDefaulter(mockDef)
-	os.Setenv("XDG_CONFIG_DIRS", strings.Join(expected, separator))
+	os.Setenv("XDG_CONFIG_DIRS", strings.Join(expected, separator)) // nolint: errcheck
 
 	actual := ConfigDirs()
 	mockDef.AssertNotCalled(t, "defaultConfigDirs")
@@ -206,7 +206,7 @@ func TestConfigDirs_Application(t *testing.T) {
 	appXDG := New(vendor, app)
 	mockDef.On("defaultConfigDirs").Return(root)
 	setDefaulter(mockDef)
-	os.Setenv("XDG_CONFIG_DIRS", "")
+	os.Setenv("XDG_CONFIG_DIRS", "") // nolint: errcheck
 
 	actual := appXDG.ConfigDirs()
 	mockDef.AssertExpectations(t)
@@ -219,7 +219,7 @@ func TestCacheHome_WithoutXDG(t *testing.T) {
 	mockDef := new(mockDefaulter)
 	mockDef.On("defaultCacheHome").Return(expected)
 	setDefaulter(mockDef)
-	os.Setenv("XDG_CACHE_HOME", "")
+	os.Setenv("XDG_CACHE_HOME", "") // nolint: errcheck
 
 	actual := CacheHome()
 	mockDef.AssertExpectations(t)
@@ -232,7 +232,7 @@ func TestCacheHome_WithXDG(t *testing.T) {
 	mockDef := new(mockDefaulter)
 	mockDef.On("defaultCacheHome").Return("/wrong/path")
 	setDefaulter(mockDef)
-	os.Setenv("XDG_CACHE_HOME", expected)
+	os.Setenv("XDG_CACHE_HOME", expected) // nolint: errcheck
 
 	actual := CacheHome()
 	mockDef.AssertNotCalled(t, "defaultCacheHome")
@@ -249,7 +249,7 @@ func TestCacheHome_Application(t *testing.T) {
 	appXDG := New(vendor, app)
 	mockDef.On("defaultCacheHome").Return(root)
 	setDefaulter(mockDef)
-	os.Setenv("XDG_CACHE_HOME", "")
+	os.Setenv("XDG_CACHE_HOME", "") // nolint: errcheck
 
 	actual := appXDG.CacheHome()
 	mockDef.AssertExpectations(t)
