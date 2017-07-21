@@ -10,7 +10,8 @@ install:
 - go version
 - go env
 - go get -t -v ./...
+- cinst codecov
 build_script:
 - go test -v -race -covermode=atomic -coverprofile=coverage.txt
 on_success:
-- bash <(curl -s https://codecov.io/bash)
+- codecov -f coverage.txt
