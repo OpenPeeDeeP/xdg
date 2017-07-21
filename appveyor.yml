@@ -9,6 +9,8 @@ install:
 - set PATH=%GOPATH%\bin;c:\go\bin;%PATH%
 - go version
 - go env
-build_script:
 - go get -t -v ./...
-- go test -v ./...
+build_script:
+- go test -v -race -covermode=atomic -coverprofile=coverage.txt
+build_success:
+- bash <(curl -s https://codecov.io/bash)
