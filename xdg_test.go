@@ -6,7 +6,6 @@ package xdg
 
 import (
 	"os"
-	"path/filepath"
 	"strings"
 	"testing"
 
@@ -39,223 +38,107 @@ func (m *mockDefaulter) defaultCacheHome() string {
 	return args.String(0)
 }
 
-func TestDataHome_WithoutXDG(t *testing.T) {
-	assert := assert.New(t)
-	expected := "/some/path"
-	mockDef := new(mockDefaulter)
-	mockDef.On("defaultDataHome").Return(expected)
-	setDefaulter(mockDef)
-	os.Setenv("XDG_DATA_HOME", "") // nolint: errcheck
+const (
+	MDataHome = iota
+	MDataDirs
+	MConfigHome
+	MConfigDirs
+	MCacheHome
+)
 
-	actual := DataHome()
-	mockDef.AssertExpectations(t)
-	assert.Equal(expected, actual)
+var getterTestCases = []getterTestCase{
+	{"DataHome Without", "defaultDataHome", "/some/path", true, "XDG_DATA_HOME", "", MDataHome, nil, "/some/path"},
+	{"DataDirs Without", "defaultDataDirs", []string{"/some/path", "/some/other/path"}, true, "XDG_DATA_DIRS", "", MDataDirs, nil, []string{"/some/path", "/some/other/path"}},
+	{"ConfigHome Without", "defaultConfigHome", "/some/path", true, "XDG_CONFIG_HOME", "", MConfigHome, nil, "/some/path"},
+	{"ConfigDirs Without", "defaultConfigDirs", []string{"/some/path", "/some/other/path"}, true, "XDG_CONFIG_DIRS", "", MConfigDirs, nil, []string{"/some/path", "/some/other/path"}},
+	{"CacheHome Without", "defaultCacheHome", "/some/path", true, "XDG_CACHE_HOME", "", MCacheHome, nil, "/some/path"},
+
+	{"DataHome With", "defaultDataHome", "/wrong/path", false, "XDG_DATA_HOME", "/some/path", MDataHome, nil, "/some/path"},
+	{"DataDirs With", "defaultDataDirs", []string{"/wrong/path", "/some/other/wrong"}, false, "XDG_DATA_DIRS", strings.Join([]string{"/some/path", "/some/other/path"}, string(os.PathListSeparator)), MDataDirs, nil, []string{"/some/path", "/some/other/path"}},
+	{"ConfigHome With", "defaultConfigHome", "/wrong/path", false, "XDG_CONFIG_HOME", "/some/path", MConfigHome, nil, "/some/path"},
+	{"ConfigDirs With", "defaultConfigDirs", []string{"/wrong/path", "/some/other/wrong"}, false, "XDG_CONFIG_DIRS", strings.Join([]string{"/some/path", "/some/other/path"}, string(os.PathListSeparator)), MConfigDirs, nil, []string{"/some/path", "/some/other/path"}},
+	{"CacheHome With", "defaultCacheHome", "/wrong/path", false, "XDG_CACHE_HOME", "/some/path", MCacheHome, nil, "/some/path"},
+
+	{"DataHome App Without", "defaultDataHome", "/some/path", true, "XDG_DATA_HOME", "", MDataHome, New("OpenPeeDeeP", "XDG"), "/some/path/OpenPeeDeeP/XDG"},
+	{"DataDirs App Without", "defaultDataDirs", []string{"/some/path", "/some/other/path"}, true, "XDG_DATA_DIRS", "", MDataDirs, New("OpenPeeDeeP", "XDG"), []string{"/some/path/OpenPeeDeeP/XDG", "/some/other/path/OpenPeeDeeP/XDG"}},
+	{"ConfigHome App Without", "defaultConfigHome", "/some/path", true, "XDG_CONFIG_HOME", "", MConfigHome, New("OpenPeeDeeP", "XDG"), "/some/path/OpenPeeDeeP/XDG"},
+	{"ConfigDirs App Without", "defaultConfigDirs", []string{"/some/path", "/some/other/path"}, true, "XDG_CONFIG_DIRS", "", MConfigDirs, New("OpenPeeDeeP", "XDG"), []string{"/some/path/OpenPeeDeeP/XDG", "/some/other/path/OpenPeeDeeP/XDG"}},
+	{"CacheHome App Without", "defaultCacheHome", "/some/path", true, "XDG_CACHE_HOME", "", MCacheHome, New("OpenPeeDeeP", "XDG"), "/some/path/OpenPeeDeeP/XDG"},
+
+	{"DataHome App With", "defaultDataHome", "/wrong/path", false, "XDG_DATA_HOME", "/some/path", MDataHome, New("OpenPeeDeeP", "XDG"), "/some/path/OpenPeeDeeP/XDG"},
+	{"DataDirs App With", "defaultDataDirs", []string{"/wrong/path", "/some/other/wrong"}, false, "XDG_DATA_DIRS", strings.Join([]string{"/some/path", "/some/other/path"}, string(os.PathListSeparator)), MDataDirs, New("OpenPeeDeeP", "XDG"), []string{"/some/path/OpenPeeDeeP/XDG", "/some/other/path/OpenPeeDeeP/XDG"}},
+	{"ConfigHome App With", "defaultConfigHome", "/wrong/path", false, "XDG_CONFIG_HOME", "/some/path", MConfigHome, New("OpenPeeDeeP", "XDG"), "/some/path/OpenPeeDeeP/XDG"},
+	{"ConfigDirs App With", "defaultConfigDirs", []string{"/wrong/path", "/some/other/wrong"}, false, "XDG_CONFIG_DIRS", strings.Join([]string{"/some/path", "/some/other/path"}, string(os.PathListSeparator)), MConfigDirs, New("OpenPeeDeeP", "XDG"), []string{"/some/path/OpenPeeDeeP/XDG", "/some/other/path/OpenPeeDeeP/XDG"}},
+	{"CacheHome App With", "defaultCacheHome", "/wrong/path", false, "XDG_CACHE_HOME", "/some/path", MCacheHome, New("OpenPeeDeeP", "XDG"), "/some/path/OpenPeeDeeP/XDG"},
 }
 
-func TestDataHome_WithXDG(t *testing.T) {
-	assert := assert.New(t)
-	expected := "/some/path"
-	mockDef := new(mockDefaulter)
-	mockDef.On("defaultDataHome").Return("/wrong/path")
-	setDefaulter(mockDef)
-	os.Setenv("XDG_DATA_HOME", expected) // nolint: errcheck
-
-	actual := DataHome()
-	mockDef.AssertNotCalled(t, "defaultDataHome")
-	assert.Equal(expected, actual)
+type getterTestCase struct {
+	name         string
+	mokedMethod  string
+	mockedReturn interface{}
+	calledMocked bool
+	env          string
+	envVal       string
+	method       int
+	xdgApp       *XDG
+	expected     interface{}
 }
 
-func TestDataHome_Application(t *testing.T) {
-	assert := assert.New(t)
-	root := "/some/path"
-	vendor := "OpenPeeDeeP"
-	app := "XDG"
-	expected := filepath.Join(root, vendor, app)
-	mockDef := new(mockDefaulter)
-	appXDG := New(vendor, app)
-	mockDef.On("defaultDataHome").Return(root)
-	setDefaulter(mockDef)
-	os.Setenv("XDG_DATA_HOME", "") // nolint: errcheck
+func TestXDG_Getters(t *testing.T) {
+	for _, tc := range getterTestCases {
+		t.Run(tc.name, func(t *testing.T) {
+			assert := assert.New(t)
+			mockDef := new(mockDefaulter)
+			mockDef.On(tc.mokedMethod).Return(tc.mockedReturn)
+			setDefaulter(mockDef)
+			os.Setenv(tc.env, tc.envVal) // nolint: errcheck
 
-	actual := appXDG.DataHome()
-	mockDef.AssertExpectations(t)
-	assert.Equal(expected, actual)
-}
+			actual := computeActual(tc)
 
-func TestDataDirs_WithoutXDG(t *testing.T) {
-	assert := assert.New(t)
-	expected := []string{"/some/path", "/some/other/path"}
-	mockDef := new(mockDefaulter)
-	mockDef.On("defaultDataDirs").Return(expected)
-	setDefaulter(mockDef)
-	os.Setenv("XDG_DATA_DIRS", "") // nolint: errcheck
-
-	actual := DataDirs()
-	mockDef.AssertExpectations(t)
-	assert.Equal(expected, actual)
-}
-
-func TestDataDirs_WithXDG(t *testing.T) {
-	assert := assert.New(t)
-	expected := []string{"/some/path", "/some/other/path"}
-	mockDef := new(mockDefaulter)
-	mockDef.On("defaultDataDirs").Return([]string{"/wrong/path"})
-	setDefaulter(mockDef)
-	os.Setenv("XDG_DATA_DIRS", strings.Join(expected, string(os.PathListSeparator))) // nolint: errcheck
-
-	actual := DataDirs()
-	mockDef.AssertNotCalled(t, "defaultDataDirs")
-	assert.Equal(expected, actual)
-}
-
-func TestDataDirs_Application(t *testing.T) {
-	assert := assert.New(t)
-	root := []string{"/some/path", "/some/other/path"}
-	vendor := "OpenPeeDeeP"
-	app := "XDG"
-	expected := make([]string, len(root))
-	for i, r := range root {
-		expected[i] = filepath.Join(r, vendor, app)
+			if tc.calledMocked {
+				mockDef.AssertExpectations(t)
+			} else {
+				mockDef.AssertNotCalled(t, tc.mokedMethod)
+			}
+			assert.Equal(tc.expected, actual)
+		})
 	}
-	mockDef := new(mockDefaulter)
-	appXDG := New(vendor, app)
-	mockDef.On("defaultDataDirs").Return(root)
-	setDefaulter(mockDef)
-	os.Setenv("XDG_DATA_DIRS", "") // nolint: errcheck
-
-	actual := appXDG.DataDirs()
-	mockDef.AssertExpectations(t)
-	assert.Equal(expected, actual)
 }
 
-func TestConfigHome_WithoutXDG(t *testing.T) {
-	assert := assert.New(t)
-	expected := "/some/path"
-	mockDef := new(mockDefaulter)
-	mockDef.On("defaultConfigHome").Return(expected)
-	setDefaulter(mockDef)
-	os.Setenv("XDG_CONFIG_HOME", "") // nolint: errcheck
-
-	actual := ConfigHome()
-	mockDef.AssertExpectations(t)
-	assert.Equal(expected, actual)
-}
-
-func TestConfigHome_WithXDG(t *testing.T) {
-	assert := assert.New(t)
-	expected := "/some/path"
-	mockDef := new(mockDefaulter)
-	mockDef.On("defaultConfigHome").Return("/wrong/path")
-	setDefaulter(mockDef)
-	os.Setenv("XDG_CONFIG_HOME", expected) // nolint: errcheck
-
-	actual := ConfigHome()
-	mockDef.AssertNotCalled(t, "defaultConfigHome")
-	assert.Equal(expected, actual)
-}
-
-func TestConfigHome_Application(t *testing.T) {
-	assert := assert.New(t)
-	root := "/some/path"
-	vendor := "OpenPeeDeeP"
-	app := "XDG"
-	expected := filepath.Join(root, vendor, app)
-	mockDef := new(mockDefaulter)
-	appXDG := New(vendor, app)
-	mockDef.On("defaultConfigHome").Return(root)
-	setDefaulter(mockDef)
-	os.Setenv("XDG_CONFIG_HOME", "") // nolint: errcheck
-
-	actual := appXDG.ConfigHome()
-	mockDef.AssertExpectations(t)
-	assert.Equal(expected, actual)
-}
-
-func TestConfigDirs_WithoutXDG(t *testing.T) {
-	assert := assert.New(t)
-	expected := []string{"/some/path", "/some/other/path"}
-	mockDef := new(mockDefaulter)
-	mockDef.On("defaultConfigDirs").Return(expected)
-	setDefaulter(mockDef)
-	os.Setenv("XDG_CONFIG_DIRS", "") // nolint: errcheck
-
-	actual := ConfigDirs()
-	mockDef.AssertExpectations(t)
-	assert.Equal(expected, actual)
-}
-
-func TestConfigDirs_WithXDG(t *testing.T) {
-	assert := assert.New(t)
-	expected := []string{"/some/path", "/some/other/path"}
-	mockDef := new(mockDefaulter)
-	mockDef.On("defaultConfigDirs").Return([]string{"/wrong/path"})
-	setDefaulter(mockDef)
-	os.Setenv("XDG_CONFIG_DIRS", strings.Join(expected, string(os.PathListSeparator))) // nolint: errcheck
-
-	actual := ConfigDirs()
-	mockDef.AssertNotCalled(t, "defaultConfigDirs")
-	assert.Equal(expected, actual)
-}
-
-func TestConfigDirs_Application(t *testing.T) {
-	assert := assert.New(t)
-	root := []string{"/some/path", "/some/other/path"}
-	vendor := "OpenPeeDeeP"
-	app := "XDG"
-	expected := make([]string, len(root))
-	for i, r := range root {
-		expected[i] = filepath.Join(r, vendor, app)
+// nolint: gocyclo
+func computeActual(tc getterTestCase) interface{} {
+	var actual interface{}
+	switch tc.method {
+	case MDataHome:
+		if tc.xdgApp != nil {
+			actual = tc.xdgApp.DataHome()
+		} else {
+			actual = DataHome()
+		}
+	case MDataDirs:
+		if tc.xdgApp != nil {
+			actual = tc.xdgApp.DataDirs()
+		} else {
+			actual = DataDirs()
+		}
+	case MConfigHome:
+		if tc.xdgApp != nil {
+			actual = tc.xdgApp.ConfigHome()
+		} else {
+			actual = ConfigHome()
+		}
+	case MConfigDirs:
+		if tc.xdgApp != nil {
+			actual = tc.xdgApp.ConfigDirs()
+		} else {
+			actual = ConfigDirs()
+		}
+	case MCacheHome:
+		if tc.xdgApp != nil {
+			actual = tc.xdgApp.CacheHome()
+		} else {
+			actual = CacheHome()
+		}
 	}
-	mockDef := new(mockDefaulter)
-	appXDG := New(vendor, app)
-	mockDef.On("defaultConfigDirs").Return(root)
-	setDefaulter(mockDef)
-	os.Setenv("XDG_CONFIG_DIRS", "") // nolint: errcheck
-
-	actual := appXDG.ConfigDirs()
-	mockDef.AssertExpectations(t)
-	assert.Equal(expected, actual)
-}
-
-func TestCacheHome_WithoutXDG(t *testing.T) {
-	assert := assert.New(t)
-	expected := "/some/path"
-	mockDef := new(mockDefaulter)
-	mockDef.On("defaultCacheHome").Return(expected)
-	setDefaulter(mockDef)
-	os.Setenv("XDG_CACHE_HOME", "") // nolint: errcheck
-
-	actual := CacheHome()
-	mockDef.AssertExpectations(t)
-	assert.Equal(expected, actual)
-}
-
-func TestCacheHome_WithXDG(t *testing.T) {
-	assert := assert.New(t)
-	expected := "/some/path"
-	mockDef := new(mockDefaulter)
-	mockDef.On("defaultCacheHome").Return("/wrong/path")
-	setDefaulter(mockDef)
-	os.Setenv("XDG_CACHE_HOME", expected) // nolint: errcheck
-
-	actual := CacheHome()
-	mockDef.AssertNotCalled(t, "defaultCacheHome")
-	assert.Equal(expected, actual)
-}
-
-func TestCacheHome_Application(t *testing.T) {
-	assert := assert.New(t)
-	root := "/some/path"
-	vendor := "OpenPeeDeeP"
-	app := "XDG"
-	expected := filepath.Join(root, vendor, app)
-	mockDef := new(mockDefaulter)
-	appXDG := New(vendor, app)
-	mockDef.On("defaultCacheHome").Return(root)
-	setDefaulter(mockDef)
-	os.Setenv("XDG_CACHE_HOME", "") // nolint: errcheck
-
-	actual := appXDG.CacheHome()
-	mockDef.AssertExpectations(t)
-	assert.Equal(expected, actual)
+	return actual
 }
