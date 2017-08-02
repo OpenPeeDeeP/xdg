@@ -101,7 +101,7 @@ func TestDataDirs_WithXDG(t *testing.T) {
 	mockDef := new(mockDefaulter)
 	mockDef.On("defaultDataDirs").Return([]string{"/wrong/path"})
 	setDefaulter(mockDef)
-	os.Setenv("XDG_DATA_DIRS", strings.Join(expected, separator)) // nolint: errcheck
+	os.Setenv("XDG_DATA_DIRS", strings.Join(expected, string(os.PathListSeparator))) // nolint: errcheck
 
 	actual := DataDirs()
 	mockDef.AssertNotCalled(t, "defaultDataDirs")
@@ -190,7 +190,7 @@ func TestConfigDirs_WithXDG(t *testing.T) {
 	mockDef := new(mockDefaulter)
 	mockDef.On("defaultConfigDirs").Return([]string{"/wrong/path"})
 	setDefaulter(mockDef)
-	os.Setenv("XDG_CONFIG_DIRS", strings.Join(expected, separator)) // nolint: errcheck
+	os.Setenv("XDG_CONFIG_DIRS", strings.Join(expected, string(os.PathListSeparator))) // nolint: errcheck
 
 	actual := ConfigDirs()
 	mockDef.AssertNotCalled(t, "defaultConfigDirs")

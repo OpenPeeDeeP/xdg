@@ -12,7 +12,6 @@ import (
 )
 
 var defaulter xdgDefaulter = new(osDefaulter)
-var separator = ":" // This is just the default
 
 type xdgDefaulter interface {
 	defaultDataHome() string
@@ -29,10 +28,6 @@ type osDefaulter struct {
 // nolint: deadcode
 func setDefaulter(def xdgDefaulter) {
 	defaulter = def
-}
-
-func setSeparator(sep string) {
-	separator = sep
 }
 
 // XDG is information about the currently running application
@@ -96,7 +91,7 @@ func DataDirs() []string {
 	var dataDirs []string
 	dataDirsStr := os.Getenv("XDG_DATA_DIRS")
 	if dataDirsStr != "" {
-		dataDirs = strings.Split(dataDirsStr, separator)
+		dataDirs = strings.Split(dataDirsStr, string(os.PathListSeparator))
 	}
 	if len(dataDirs) == 0 {
 		dataDirs = defaulter.defaultDataDirs()
@@ -118,7 +113,7 @@ func ConfigDirs() []string {
 	var configDirs []string
 	configDirsStr := os.Getenv("XDG_CONFIG_DIRS")
 	if configDirsStr != "" {
-		configDirs = strings.Split(configDirsStr, separator)
+		configDirs = strings.Split(configDirsStr, string(os.PathListSeparator))
 	}
 	if len(configDirs) == 0 {
 		configDirs = defaulter.defaultConfigDirs()
