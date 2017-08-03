@@ -6,6 +6,8 @@ A cross platform package that tries to follow [XDG Standard](https://standards.f
 
 The following table shows what is used if the envrionment variable is not set. If the variable is set then this package uses that. Linux follows the default standards. Mac does when it comes to the home directory but for system wide it uses the standard `/Library/Application Support`. As for Windows, the variable defaults are just other environment variables set up by the operation system.
 
+> When creating `XDG` application the `Vendor` and `Application` names are appeneded to the end of the path to keep projects unique.
+
 |  | Linux | Mac | Windows |
 | ---: | :---: | :---: | :---: |
 | `XDG_DATA_DIRS` | [`/usr/local/share`, `/usr/share`] | [`/Library/Application Support`] | `%PROGRAMDATA%` |
