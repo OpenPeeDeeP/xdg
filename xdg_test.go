@@ -174,8 +174,8 @@ var queryTestCases = []queryTestCase{
 	{"Config Home", New("OpenPeeDeeP", "XDG"), QConfig, "XDG_CONFIG_HOME.txt", filepath.Clean("/config/home/OpenPeeDeeP/XDG/XDG_CONFIG_HOME.txt")},
 	{"Config DNE", New("OpenPeeDeeP", "XDG"), QConfig, "XDG_DATA_HOME.txt", ""},
 
-	{"Config Home", New("OpenPeeDeeP", "XDG"), QCache, "XDG_CACHE_HOME.txt", filepath.Clean("/cache/home/OpenPeeDeeP/XDG/XDG_CACHE_HOME.txt")},
-	{"Config DNE", New("OpenPeeDeeP", "XDG"), QCache, "XDG_CACHE_DIRS.txt", ""},
+	{"Cache Home", New("OpenPeeDeeP", "XDG"), QCache, "XDG_CACHE_HOME.txt", filepath.Clean("/cache/home/OpenPeeDeeP/XDG/XDG_CACHE_HOME.txt")},
+	{"Cache DNE", New("OpenPeeDeeP", "XDG"), QCache, "XDG_CACHE_DIRS.txt", ""},
 }
 
 func TestXDG_Query(t *testing.T) {
