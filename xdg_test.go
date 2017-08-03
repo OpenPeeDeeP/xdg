@@ -5,6 +5,7 @@
 package xdg
 
 import (
+	"fmt"
 	"os"
 	"path/filepath"
 	"strings"
@@ -142,4 +143,92 @@ func computeActual(tc getterTestCase) interface{} {
 		}
 	}
 	return actual
+}
+
+const (
+	QData = iota
+	QConfig
+	QCache
+)
+
+var (
+	root      = "testingFolder"
+	fileTypes = []string{"data", "config", "cache"}
+	fileLoc   = []string{"home", "dirs"}
+)
+
+type queryTestCase struct {
+	name      string
+	xdgApp    *XDG
+	queryType int
+	filename  string
+	expected  string
+}
+
+var queryTestCases = []queryTestCase{
+	{"Data Dirs", New("OpenPeeDeeP", "XDG"), QData, "XDG_DATA_DIRS.txt", "/data/dirs/OpenPeeDeeP/XDG/XDG_DATA_DIRS.txt"},
+	{"Data Home", New("OpenPeeDeeP", "XDG"), QData, "XDG_DATA_HOME.txt", "/data/home/OpenPeeDeeP/XDG/XDG_DATA_HOME.txt"},
+	{"Data DNE", New("OpenPeeDeeP", "XDG"), QData, "XDG_CONFIG_HOME.txt", ""},
+
+	{"Config Dirs", New("OpenPeeDeeP", "XDG"), QConfig, "XDG_CONFIG_DIRS.txt", "/config/dirs/OpenPeeDeeP/XDG/XDG_CONFIG_DIRS.txt"},
+	{"Config Home", New("OpenPeeDeeP", "XDG"), QConfig, "XDG_CONFIG_HOME.txt", "/config/home/OpenPeeDeeP/XDG/XDG_CONFIG_HOME.txt"},
+	{"Config DNE", New("OpenPeeDeeP", "XDG"), QConfig, "XDG_DATA_HOME.txt", ""},
+
+	{"Config Home", New("OpenPeeDeeP", "XDG"), QCache, "XDG_CACHE_HOME.txt", "/cache/home/OpenPeeDeeP/XDG/XDG_CACHE_HOME.txt"},
+	{"Config DNE", New("OpenPeeDeeP", "XDG"), QCache, "XDG_CACHE_DIRS.txt", ""},
+}
+
+func TestXDG_Query(t *testing.T) {
+	for _, tc := range queryTestCases {
+		t.Run(tc.name, func(t *testing.T) {
+			defer teardownQueryData() //nolint: errcheck
+			standupQueryData(tc)      //nolint: errcheck
+			assert := assert.New(t)
+			actual := computeQuery(tc)
+			assert.Equal(tc.expected, actual)
+		})
+	}
+}
+
+func computeQuery(tc queryTestCase) string {
+	var actual string
+	switch tc.queryType {
+	case QData:
+		actual = tc.xdgApp.QueryData(tc.filename)
+	case QCache:
+		actual = tc.xdgApp.QueryCache(tc.filename)
+	case QConfig:
+		actual = tc.xdgApp.QueryConfig(tc.filename)
+	}
+	rootAbs, _ := filepath.Abs(root)
+	actual = strings.Replace(actual, rootAbs, "", 1)
+	return actual
+}
+
+func standupQueryData(tc queryTestCase) error {
+	for _, t := range fileTypes {
+		for _, l := range fileLoc {
+			path, err := filepath.Abs(filepath.Join(root, t, l))
+			if err != nil {
+				return err
+			}
+			if err = os.MkdirAll(filepath.Join(path, tc.xdgApp.Vendor, tc.xdgApp.Application), 0777); err != nil {
+				return err
+			}
+			envVar := fmt.Sprintf("XDG_%s_%s", strings.ToUpper(t), strings.ToUpper(l))
+			if err = os.Setenv(envVar, path); err != nil {
+				return err
+			}
+			file, err := os.OpenFile(filepath.Join(path, tc.xdgApp.Vendor, tc.xdgApp.Application, envVar+".txt"), os.O_CREATE|os.O_RDONLY, 0666)
+			if err != nil {
+				return err
+			}
+			defer file.Close() //nolint: errcheck
+		}
+	}
+	return nil
+}
+
+func teardownQueryData() error {
+	return os.RemoveAll(root)
 }

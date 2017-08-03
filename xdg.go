@@ -77,6 +77,38 @@ func (x *XDG) CacheHome() string {
 	return filepath.Join(CacheHome(), x.Vendor, x.Application)
 }
 
+// QueryData looks for the given filename in XDG paths for data files.
+// Returns an empty string if one was not found.
+func (x *XDG) QueryData(filename string) string {
+	dirs := x.DataDirs()
+	dirs = append(dirs, x.DataHome())
+	return returnExist(filename, dirs)
+}
+
+// QueryConfig looks for the given filename in XDG paths for config files.
+// Returns an empty string if one was not found.
+func (x *XDG) QueryConfig(filename string) string {
+	dirs := x.ConfigDirs()
+	dirs = append(dirs, x.ConfigHome())
+	return returnExist(filename, dirs)
+}
+
+// QueryCache looks for the given filename in XDG paths for cache files.
+// Returns an empty string if one was not found.
+func (x *XDG) QueryCache(filename string) string {
+	return returnExist(filename, []string{x.CacheHome()})
+}
+
+func returnExist(filename string, dirs []string) string {
+	for _, dir := range dirs {
+		_, err := os.Stat(filepath.Join(dir, filename))
+		if (err != nil && os.IsExist(err)) || err == nil {
+			return filepath.Join(dir, filename)
+		}
+	}
+	return ""
+}
+
 // DataHome returns the location that should be used for user specific data files
 func DataHome() string {
 	dataHome := os.Getenv("XDG_DATA_HOME")
