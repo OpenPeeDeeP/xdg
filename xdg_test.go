@@ -166,15 +166,15 @@ type queryTestCase struct {
 }
 
 var queryTestCases = []queryTestCase{
-	{"Data Dirs", New("OpenPeeDeeP", "XDG"), QData, "XDG_DATA_DIRS.txt", "/data/dirs/OpenPeeDeeP/XDG/XDG_DATA_DIRS.txt"},
-	{"Data Home", New("OpenPeeDeeP", "XDG"), QData, "XDG_DATA_HOME.txt", "/data/home/OpenPeeDeeP/XDG/XDG_DATA_HOME.txt"},
+	{"Data Dirs", New("OpenPeeDeeP", "XDG"), QData, "XDG_DATA_DIRS.txt", filepath.Clean("/data/dirs/OpenPeeDeeP/XDG/XDG_DATA_DIRS.txt")},
+	{"Data Home", New("OpenPeeDeeP", "XDG"), QData, "XDG_DATA_HOME.txt", filepath.Clean("/data/home/OpenPeeDeeP/XDG/XDG_DATA_HOME.txt")},
 	{"Data DNE", New("OpenPeeDeeP", "XDG"), QData, "XDG_CONFIG_HOME.txt", ""},
 
-	{"Config Dirs", New("OpenPeeDeeP", "XDG"), QConfig, "XDG_CONFIG_DIRS.txt", "/config/dirs/OpenPeeDeeP/XDG/XDG_CONFIG_DIRS.txt"},
-	{"Config Home", New("OpenPeeDeeP", "XDG"), QConfig, "XDG_CONFIG_HOME.txt", "/config/home/OpenPeeDeeP/XDG/XDG_CONFIG_HOME.txt"},
+	{"Config Dirs", New("OpenPeeDeeP", "XDG"), QConfig, "XDG_CONFIG_DIRS.txt", filepath.Clean("/config/dirs/OpenPeeDeeP/XDG/XDG_CONFIG_DIRS.txt")},
+	{"Config Home", New("OpenPeeDeeP", "XDG"), QConfig, "XDG_CONFIG_HOME.txt", filepath.Clean("/config/home/OpenPeeDeeP/XDG/XDG_CONFIG_HOME.txt")},
 	{"Config DNE", New("OpenPeeDeeP", "XDG"), QConfig, "XDG_DATA_HOME.txt", ""},
 
-	{"Config Home", New("OpenPeeDeeP", "XDG"), QCache, "XDG_CACHE_HOME.txt", "/cache/home/OpenPeeDeeP/XDG/XDG_CACHE_HOME.txt"},
+	{"Config Home", New("OpenPeeDeeP", "XDG"), QCache, "XDG_CACHE_HOME.txt", filepath.Clean("/cache/home/OpenPeeDeeP/XDG/XDG_CACHE_HOME.txt")},
 	{"Config DNE", New("OpenPeeDeeP", "XDG"), QCache, "XDG_CACHE_DIRS.txt", ""},
 }
 
