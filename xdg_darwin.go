@@ -10,7 +10,7 @@ import (
 )
 
 func (o *osDefaulter) defaultDataHome() string {
-	return filepath.Join(os.Getenv("HOME"), ".local", "share")
+	return filepath.Join(os.Getenv("HOME"), "Library", "Application Support")
 }
 
 func (o *osDefaulter) defaultDataDirs() []string {
@@ -18,7 +18,7 @@ func (o *osDefaulter) defaultDataDirs() []string {
 }
 
 func (o *osDefaulter) defaultConfigHome() string {
-	return filepath.Join(os.Getenv("HOME"), ".config")
+	return filepath.Join(os.Getenv("HOME"), "Library", "Application Support")
 }
 
 func (o *osDefaulter) defaultConfigDirs() []string {

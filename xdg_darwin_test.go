@@ -17,7 +17,7 @@ func TestDefaultDataHome(t *testing.T) {
 	setDefaulter(new(osDefaulter))
 	assert := assert.New(t)
 	homeDir := "/some/path"
-	expected := homeDir + "/.local/share"
+	expected := homeDir + "/Library/Application Support"
 	os.Setenv("HOME", homeDir) // nolint: errcheck
 
 	actual := defaulter.defaultDataHome()
@@ -37,7 +37,7 @@ func TestDefaultConfigHome(t *testing.T) {
 	setDefaulter(new(osDefaulter))
 	assert := assert.New(t)
 	homeDir := "/some/path"
-	expected := homeDir + "/.config"
+	expected := homeDir + "/Library/Application Support"
 	os.Setenv("HOME", homeDir) // nolint: errcheck
 
 	actual := defaulter.defaultConfigHome()
