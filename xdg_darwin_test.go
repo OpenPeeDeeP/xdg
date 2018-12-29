@@ -57,7 +57,7 @@ func TestDefaultCacheHome(t *testing.T) {
 	setDefaulter(new(osDefaulter))
 	assert := assert.New(t)
 	homeDir := "/some/path"
-	expected := homeDir + "/.cache"
+	expected := homeDir + "/Library/Caches"
 	os.Setenv("HOME", homeDir) // nolint: errcheck
 
 	actual := defaulter.defaultCacheHome()

@@ -14,7 +14,7 @@ The following table shows what is used if the envrionment variable is not set. I
 | `XDG_DATA_HOME` | `~/.local/share` | `~/.local/share` | `%APPDATA%` |
 | `XDG_CONFIG_DIRS` | [`/etc/xdg`] | [`/Library/Application Support`] | `%PROGRAMDATA%` |
 | `XDG_CONFIG_HOME` | `~/.config` | `~/.config` | `%APPDATA%` |
-| `XDG_CACHE_HOME` | `~/.cache` | `~/.cache` | `%LOCALAPPDATA%` |
+| `XDG_CACHE_HOME` | `~/.cache` | `~/Library/Cache` | `%LOCALAPPDATA%` |
 
 ## Notes
 
