@@ -26,5 +26,5 @@ func (o *osDefaulter) defaultConfigDirs() []string {
 }
 
 func (o *osDefaulter) defaultCacheHome() string {
-	return filepath.Join(os.Getenv("HOME"), ".cache")
+	return filepath.Join(os.Getenv("HOME"), "Library", "Caches")
 }
