@@ -4,7 +4,7 @@ platform: x64
 clone_folder: c:\gopath\src\github.com\OpenPeeDeeP\xdg
 environment:
   GOPATH: c:\gopath
-stack: go 1.10
+stack: go 1.11
 install:
   - go get -t -v ./...
   - cinst codecov
