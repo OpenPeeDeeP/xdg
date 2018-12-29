@@ -81,7 +81,7 @@ func (x *XDG) CacheHome() string {
 // Returns an empty string if one was not found.
 func (x *XDG) QueryData(filename string) string {
 	dirs := x.DataDirs()
-	dirs = append(dirs, x.DataHome())
+	dirs = append([]string{x.DataHome()}, dirs...)
 	return returnExist(filename, dirs)
 }
 
@@ -89,7 +89,7 @@ func (x *XDG) QueryData(filename string) string {
 // Returns an empty string if one was not found.
 func (x *XDG) QueryConfig(filename string) string {
 	dirs := x.ConfigDirs()
-	dirs = append(dirs, x.ConfigHome())
+	dirs = append([]string{x.ConfigHome()}, dirs...)
 	return returnExist(filename, dirs)
 }
 
