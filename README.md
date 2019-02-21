@@ -8,7 +8,7 @@ The following table shows what is used if the envrionment variable is not set. I
 
 > When creating `XDG` application the `Vendor` and `Application` names are appeneded to the end of the path to keep projects unique.
 
-|  | Linux | Mac | Windows |
+|  | Linux(and BSD) | Mac | Windows |
 | ---: | :---: | :---: | :---: |
 | `XDG_DATA_DIRS` | [`/usr/local/share`, `/usr/share`] | [`/Library/Application Support`] | `%PROGRAMDATA%` |
 | `XDG_DATA_HOME` | `~/.local/share` | `~/Library/Application Support` | `%APPDATA%` |
